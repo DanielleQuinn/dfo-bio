@@ -21,7 +21,8 @@ error_type1<-c() # if datetime2 < datetime3
 error_type2<-c() # if set n < set n-1
 error1_details<-list()
 error2_details<-list()
-for(i in unique(ISSETPROFILE_WIDE$TRIP_ID)[1:100])
+starttime<-now()
+for(i in unique(ISSETPROFILE_WIDE$TRIP_ID)[1:1000])
 {
   total=total+1
   testdata<-ISSETPROFILE_WIDE%>%filter(TRIP_ID==i)
@@ -51,9 +52,14 @@ for(i in unique(ISSETPROFILE_WIDE$TRIP_ID)[1:100])
     }
   }
 }
+endtime<-now()
 paste("Checked", checked, "of", total)
+paste("Time elapsed:", round(difftime(endtime, starttime, unit='sec'),2), "seconds")
+paste("Time per check:", round(checked/as.numeric(difftime(endtime, starttime, unit='sec')),2), "checks per second")
+paste("Time per check:", round(as.numeric(difftime(endtime, starttime, unit='sec'))/checked,2), "seconds per check")
+
 error_type1
-error2_details
+error1_details
 error_type2
 error2_details
 
