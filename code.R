@@ -14,54 +14,61 @@ ISSETPROFILE_WIDE$DATE_TIME2[year(ISSETPROFILE_WIDE$DATE_TIME2)==9999]<-NA
 ISSETPROFILE_WIDE$DATE_TIME3[year(ISSETPROFILE_WIDE$DATE_TIME3)==9999]<-NA
 ISSETPROFILE_WIDE$DATE_TIME4[year(ISSETPROFILE_WIDE$DATE_TIME4)==9999]<-NA
 
+# Set up table describing datetime structure to reduce wasted time in loop
+date_ref<-ISSETPROFILE_WIDE%>%
+  group_by(TRIP_ID)%>%
+  summarise(d1=sum(!is.na(DATE_TIME1)),
+            d2=sum(!is.na(DATE_TIME2)),
+            d3=sum(!is.na(DATE_TIME3)),
+            d4=sum(!is.na(DATE_TIME4)))
+trips_23<-(date_ref%>%
+  filter(d1==0 & d4==0 & d2>0 & d3>0)%>%
+  select(TRIP_ID)%>%data.frame())$TRIP_ID
+
 # Group by TRIP_ID and apply error checking functions.
 total<-0 # count total trips considered
-checked<-0 # count total trips checked against d2/d3
 error_type1<-c() # if datetime2 < datetime3
 error_type2<-c() # if set n < set n-1
 error1_details<-list()
 error2_details<-list()
 starttime<-now()
-for(i in unique(ISSETPROFILE_WIDE$TRIP_ID)[1:1000])
+for(i in unique(trips_23)[1:1000])
 {
   total=total+1
   testdata<-ISSETPROFILE_WIDE%>%filter(TRIP_ID==i)
-  checkNAs<-testdata%>%summarise(d1=sum(!is.na(DATE_TIME1)),
-                                 d2=sum(!is.na(DATE_TIME2)),
-                                 d3=sum(!is.na(DATE_TIME3)),
-                                 d4=sum(!is.na(DATE_TIME4)))
-  if(checkNAs$d2>0 & checkNAs$d3>0)
+  testdata<-testdata[order(testdata$SET_NO),]
+  
+  # Step 1: Are all datetime3 > datetime2?
+  if(length(which(testdata$DATE_TIME3<testdata$DATE_TIME2))>0)
   {
-    checked=checked+1
-    testdata<-testdata[order(testdata$SET_NO),]
-    
-    # Step 1: Are all datetime3 > datetime2?
-    if(length(which(testdata$DATE_TIME3<testdata$DATE_TIME2))>0)
-    {
-      error_type1<-c(error_type1,i)
-      error1_details<-append(error1_details, list(c(testdata$SET_NO[which(testdata$DATE_TIME3<testdata$DATE_TIME2)])))
-      names(error1_details)[length(error1_details)]<-i
-    }
-    
-    # Step 2: Are all datetime2 > datetime3-1
-    if(length(which(testdata$DATE_TIME2[-1]<testdata$DATE_TIME3[1:nrow(testdata)-1]))>0)
-    {
-      error_type2<-c(error_type2, i)
-      error2_details<-append(error2_details, list(c(testdata$SET_NO[which(testdata$DATE_TIME2[-1]<testdata$DATE_TIME3[1:nrow(testdata)-1])])))
-      names(error2_details)[length(error2_details)]<-i
-    }
+    error_type1<-c(error_type1,i)
+    error1_details<-append(error1_details, list(c(testdata$SET_NO[which(testdata$DATE_TIME3<testdata$DATE_TIME2)])))
+    names(error1_details)[length(error1_details)]<-i
+  }
+  
+  # Step 2: Are all datetime2 > datetime3-1
+  if(length(which(testdata$DATE_TIME2[-1]<testdata$DATE_TIME3[1:nrow(testdata)-1]))>0)
+  {
+    error_type2<-c(error_type2, i)
+    error2_details<-append(error2_details, list(c(testdata$SET_NO[which(testdata$DATE_TIME2[-1]<testdata$DATE_TIME3[1:nrow(testdata)-1])])))
+    names(error2_details)[length(error2_details)]<-i
   }
 }
 endtime<-now()
-paste("Checked", checked, "of", total)
 paste("Time elapsed:", round(difftime(endtime, starttime, unit='sec'),2), "seconds")
-paste("Time per check:", round(checked/as.numeric(difftime(endtime, starttime, unit='sec')),2), "checks per second")
-paste("Time per check:", round(as.numeric(difftime(endtime, starttime, unit='sec'))/checked,2), "seconds per check")
+paste("Checks per time:", round(total/as.numeric(difftime(endtime, starttime, unit='sec')),2), "checks per second")
+paste("Time per check:", round(as.numeric(difftime(endtime, starttime, unit='sec'))/total,2), "seconds per check")
+# WAY FASTER! [0.12 seconds per check to 0.03 seconds per check]
 
 error_type1
 error1_details
 error_type2
 error2_details
+
+
+
+
+
 
 
 
