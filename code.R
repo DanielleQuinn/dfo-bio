@@ -21,17 +21,23 @@ date_ref<-ISSETPROFILE_WIDE%>%
             d2=sum(!is.na(DATE_TIME2)),
             d3=sum(!is.na(DATE_TIME3)),
             d4=sum(!is.na(DATE_TIME4)))
+
+# ---- Type 1: Available d2 & d3 ----
 trips_23<-(date_ref%>%
   filter(d1==0 & d4==0 & d2>0 & d3>0)%>%
   select(TRIP_ID)%>%data.frame())$TRIP_ID
 
-# Group by TRIP_ID and apply error checking functions.
-total<-0 # count total trips considered
+# Set up error reports
 error_type1<-c() # if datetime2 < datetime3
 error_type2<-c() # if set n < set n-1
 error1_details<-list()
 error2_details<-list()
+
+# Optional code for estimating efficiency
+total<-0 # count total trips considered
 starttime<-now()
+
+# Check for errors and generate error reports
 for(i in unique(trips_23)[1:1000])
 {
   total=total+1
@@ -54,12 +60,15 @@ for(i in unique(trips_23)[1:1000])
     names(error2_details)[length(error2_details)]<-i
   }
 }
+
+# Optional code for estimating efficiency
 endtime<-now()
 paste("Time elapsed:", round(difftime(endtime, starttime, unit='sec'),2), "seconds")
 paste("Checks per time:", round(total/as.numeric(difftime(endtime, starttime, unit='sec')),2), "checks per second")
 paste("Time per check:", round(as.numeric(difftime(endtime, starttime, unit='sec'))/total,2), "seconds per check")
-# WAY FASTER! [0.12 seconds per check to 0.03 seconds per check]
+# WAY FASTER! [0.12 seconds per check to 0.03 seconds per check; from 1 hour to 8 minutes]
 
+# View error reports
 error_type1
 error1_details
 error_type2
@@ -71,5 +80,5 @@ error2_details
 
 
 
-
+# ---- Pieces for later ----
 difftime(testdata$DATE_TIME2[-1], testdata$DATE_TIME3[1:nrow(testdata)-1])
