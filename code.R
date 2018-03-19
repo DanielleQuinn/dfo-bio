@@ -203,3 +203,13 @@ trips_0<-(date_ref%>%
 
 # ---- Pieces for later ----
 difftime(testdata$DATE_TIME2[-1], testdata$DATE_TIME3[1:nrow(testdata)-1])
+
+
+# ---- Look at structure of DATE_TIMEX information ----
+date_ref_temp<-date_ref
+date_ref_temp$d1[date_ref_temp$d1>0]<-1
+date_ref_temp$d2[date_ref_temp$d2>0]<-1
+date_ref_temp$d3[date_ref_temp$d3>0]<-1
+date_ref_temp$d4[date_ref_temp$d4>0]<-1
+date_ref_temp<-date_ref_temp%>%mutate(type=paste0(d1,d2,d3,d4))
+table(date_ref_temp$type)
