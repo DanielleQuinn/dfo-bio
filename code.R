@@ -15,16 +15,13 @@ ISSETPROFILE_WIDE$DATE_TIME3[year(ISSETPROFILE_WIDE$DATE_TIME3)==9999]<-NA
 ISSETPROFILE_WIDE$DATE_TIME4[year(ISSETPROFILE_WIDE$DATE_TIME4)==9999]<-NA
 
 # Group by TRIP_ID and apply error checking functions.
-a<-unique(ISSETPROFILE_WIDE$TRIP_ID)[1]
-testdata<-ISSETPROFILE_WIDE%>%
-  filter(TRIP_ID == a)%>%
-  select(TRIP_ID, SET_NO,DATE_TIME1, DATE_TIME2, DATE_TIME3, DATE_TIME4)
-testdata<-testdata[order(testdata$SET_NO),]
-testdata
-
-total<-0
-checked<-0
-for(i in unique(ISSETPROFILE_WIDE$TRIP_ID)[1:1000])
+total<-0 # count total trips considered
+checked<-0 # count total trips checked against d2/d3
+error_type1<-c() # if datetime2 < datetime3
+error_type2<-c() # if set n < set n-1
+error1_details<-list()
+error2_details<-list()
+for(i in unique(ISSETPROFILE_WIDE$TRIP_ID)[1:100])
 {
   total=total+1
   testdata<-ISSETPROFILE_WIDE%>%filter(TRIP_ID==i)
@@ -37,18 +34,28 @@ for(i in unique(ISSETPROFILE_WIDE$TRIP_ID)[1:1000])
     checked=checked+1
     testdata<-testdata[order(testdata$SET_NO),]
     
-    print(paste("Trip ID:", i))
     # Step 1: Are all datetime3 > datetime2?
     if(length(which(testdata$DATE_TIME3<testdata$DATE_TIME2))>0)
-      print(which(testdata$DATE_TIME3<testdata$DATE_TIME2))
+    {
+      error_type1<-c(error_type1,i)
+      error1_details<-append(error1_details, list(c(testdata$SET_NO[which(testdata$DATE_TIME3<testdata$DATE_TIME2)])))
+      names(error1_details)[length(error1_details)]<-i
+    }
     
     # Step 2: Are all datetime2 > datetime3-1
     if(length(which(testdata$DATE_TIME2[-1]<testdata$DATE_TIME3[1:nrow(testdata)-1]))>0)
-      print(which(testdata$DATE_TIME2[-1]<testdata$DATE_TIME3[1:nrow(testdata)-1]))
+    {
+      error_type2<-c(error_type2, i)
+      error2_details<-append(error2_details, list(c(testdata$SET_NO[which(testdata$DATE_TIME2[-1]<testdata$DATE_TIME3[1:nrow(testdata)-1])])))
+      names(error2_details)[length(error2_details)]<-i
+    }
   }
 }
 paste("Checked", checked, "of", total)
-
+error_type1
+error2_details
+error_type2
+error2_details
 
 
 
