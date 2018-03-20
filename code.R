@@ -4,6 +4,7 @@ load("data/ISDB.ISFISHSETS.RData")
 load("data/ISDB.ISSETPROFILE_WIDE.RData")
 library(dplyr)
 library(lubridate)
+library(tidyr)
 
 # ---- Data Manipulation ----
 # Use left join to add TRIP_ID to ISSETPROFILE_WIDE
@@ -207,9 +208,35 @@ difftime(testdata$DATE_TIME2[-1], testdata$DATE_TIME3[1:nrow(testdata)-1])
 
 # ---- Look at structure of DATE_TIMEX information ----
 date_ref_temp<-date_ref
-date_ref_temp$d1[date_ref_temp$d1>0]<-1
-date_ref_temp$d2[date_ref_temp$d2>0]<-1
-date_ref_temp$d3[date_ref_temp$d3>0]<-1
-date_ref_temp$d4[date_ref_temp$d4>0]<-1
-date_ref_temp<-date_ref_temp%>%mutate(type=paste0(d1,d2,d3,d4))
+date_ref_temp$d1[date_ref_temp$d1>0]<-"Y"
+date_ref_temp$d2[date_ref_temp$d2>0]<-"Y"
+date_ref_temp$d3[date_ref_temp$d3>0]<-"Y"
+date_ref_temp$d4[date_ref_temp$d4>0]<-"Y"
+
+date_ref_temp$d1[date_ref_temp$d1==0]<-"N"
+date_ref_temp$d2[date_ref_temp$d2==0]<-"N"
+date_ref_temp$d3[date_ref_temp$d3==0]<-"N"
+date_ref_temp$d4[date_ref_temp$d4==0]<-"N"
+
+date_ref_temp<-date_ref_temp%>%mutate(type=paste(d1,d2,d3,d4))
 table(date_ref_temp$type)
+
+table1<-date_ref_temp%>%
+  group_by(type)%>%
+  summarise(Count=n())%>%
+  data.frame()
+table1<-table1[order(-table1$Count),]
+table1<-separate(table1, type, sep=" ", into=c("DATE_TIME1",
+                                       "DATE_TIME2",
+                                       "DATE_TIME3",
+                                       "DATE_TIME4"))
+row.names(table1)<-NULL
+write.csv(table1, "table1.csv")
+
+date_ref_temp%>%
+  filter(type=="1011")
+#2881, 3054, 3178
+
+ISSETPROFILE_WIDE%>%
+  filter(TRIP_ID==3178)%>%
+  select(SET_NO, DATE_TIME1, DATE_TIME3, DATE_TIME4)
