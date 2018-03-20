@@ -128,3 +128,14 @@ datetime_34<-function(print_errors=FALSE)
     
   if(print_errors==TRUE){return(list(errors_sten_2, errors_seq_2))}
 }
+
+# ---- Run all datetime functions ----
+datetime_all<-function(x=TRUE)
+{
+  datetime_0()
+  datetime_1(print_errors=x)
+  datetime_2(print_errors=x)
+  datetime_34(print_errors=x)
+}
+
+datetime_0()

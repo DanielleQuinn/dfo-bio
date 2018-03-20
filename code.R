@@ -134,7 +134,7 @@ error1_details
 error_type2
 error2_details
 
-# ---- Type 4: Available d1, d2, d3, d4 ----
+# ---- Type 3: Available d1, d2, d3, d4 ----
 trips_1234<-(date_ref%>%
             filter(d1>0 & d4>0 & d2>0 & d3>0)%>%
             select(TRIP_ID)%>%data.frame())$TRIP_ID
@@ -193,7 +193,7 @@ error2_details
 ISSETPROFILE_WIDE%>%filter(TRIP_ID==8802)%>%
   select(SET_NO, DATE_TIME1, DATE_TIME2, DATE_TIME3, DATE_TIME4)
 
-# ---- Type 3: No Available datetime information ----
+# ---- Type 4: No Available datetime information ----
 trips_0<-(date_ref%>%
              filter(d1==0 & d4==0 & d2==0 & d3==0)%>%
              select(TRIP_ID)%>%data.frame())$TRIP_ID
@@ -201,9 +201,6 @@ trips_0<-(date_ref%>%
 
 
 
-
-# ---- Pieces for later ----
-difftime(testdata$DATE_TIME2[-1], testdata$DATE_TIME3[1:nrow(testdata)-1])
 
 
 # ---- Look at structure of DATE_TIMEX information ----
@@ -233,10 +230,5 @@ table1<-separate(table1, type, sep=" ", into=c("DATE_TIME1",
 row.names(table1)<-NULL
 write.csv(table1, "table1.csv")
 
-date_ref_temp%>%
-  filter(type=="1011")
-#2881, 3054, 3178
 
-ISSETPROFILE_WIDE%>%
-  filter(TRIP_ID==3178)%>%
-  select(SET_NO, DATE_TIME1, DATE_TIME3, DATE_TIME4)
+
