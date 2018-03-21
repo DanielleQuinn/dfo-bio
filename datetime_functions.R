@@ -1,20 +1,17 @@
 # All functions here require {dplyr}
 
 # ---- Function: datetime_ref() ----
-# Produces: dt_ref (tibble) and dt_ref_sum (dataframe)
+# Produces: dt_ref_sum (dataframe)
 # Optional Argument: unique TRIP_ID to check (x)
 # Requires: ISSETPROFILE_WIDE with TRIP_ID appended and 1999-01-01 dates converted to NA
 datetime_ref<-function(x=unique(ISSETPROFILE_WIDE$TRIP_ID))
 {
-  dt_ref<<-ISSETPROFILE_WIDE%>%
+  dt_ref_sum<<-ISSETPROFILE_WIDE%>%
     filter(TRIP_ID %in% x)%>%
     group_by(TRIP_ID)%>%
-    summarise(d1=sum(!is.na(DATE_TIME1)),
-              d2=sum(!is.na(DATE_TIME2)),
-              d3=sum(!is.na(DATE_TIME3)),
-              d4=sum(!is.na(DATE_TIME4)))
-  dt_ref_sum<<-dt_ref%>%
-    data.frame()%>%gather("type","value",2:5)%>%
+    summarise(d1=sum(!is.na(DATE_TIME1)), d2=sum(!is.na(DATE_TIME2)), d3=sum(!is.na(DATE_TIME3)), d4=sum(!is.na(DATE_TIME4)))%>%
+    data.frame()%>%
+    gather("type","value",2:5)%>%
     mutate(newvalue=ifelse(value>0,1,0))%>%
     select(TRIP_ID, type, newvalue)%>%
     spread(type, newvalue)%>%
@@ -130,12 +127,10 @@ datetime_34<-function(print_errors=FALSE)
 }
 
 # ---- Run all datetime functions ----
-datetime_all<-function(x=TRUE)
+datetime_all<-function(print_all=TRUE)
 {
   datetime_0()
-  datetime_1(print_errors=x)
-  datetime_2(print_errors=x)
-  datetime_34(print_errors=x)
+  datetime_1(print_errors=print_all)
+  datetime_2(print_errors=print_all)
+  datetime_34(print_errors=print_all)
 }
-
-datetime_0()
