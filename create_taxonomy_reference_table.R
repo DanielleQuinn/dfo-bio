@@ -15,6 +15,7 @@ sea_taxa<-SLtaxa%>%
   data.frame()
 
 taxa_table<-rbind(fish_taxa, sea_taxa)
+
 # Convert to uppercase for ease of applying later functions
 for(i in 1:ncol(taxa_table)) {taxa_table[,i]<-toupper(taxa_table[,i])}
 

@@ -1,5 +1,4 @@
 # ---- Load Workspace and Packages ----
-load("data/ISDB.ISTRIPS.RData")
 load("data/ISDB.ISFISHSETS.RData")
 load("data/ISDB.ISSETPROFILE_WIDE.RData")
 library(dplyr)
@@ -22,10 +21,6 @@ datetime_ref()
 datetime_all(print_all=FALSE)
 ept<-now()
 ept-spt
-
-# 500: 13.7 seconds
-# 5000: 2.03 minutes
-# ALL: 
 
 write.csv(errors_seq_1, "error-reports/errors_seq_1.csv", row.names=FALSE)
 write.csv(errors_seq_2, "error-reports/errors_seq_2.csv", row.names=FALSE)
