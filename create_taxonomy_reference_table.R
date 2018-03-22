@@ -4,10 +4,6 @@ library(rfishbase)
 FBtaxa<-load_taxa()
 SLtaxa<-load_taxa(server = "https://fishbase.ropensci.org/sealifebase")
 
-
-head(FBtaxa, 1)
-head(SLtaxa,1)
-
 fish_taxa<-FBtaxa%>%
   select(Class, Order, Family, SubFamily, Genus, Species, FBname)%>%
   mutate(Source="FishBase")%>%
@@ -18,5 +14,8 @@ sea_taxa<-SLtaxa%>%
   mutate(Source="SeaLifeBase")%>%
   data.frame()
 
-taxa<-rbind(fish_taxa, sea_taxa)
-write.csv(taxa, "data/taxonomy_reference_table.csv")
+taxa_table<-rbind(fish_taxa, sea_taxa)
+# Convert to uppercase for ease of applying later functions
+for(i in 1:ncol(taxa_table)) {taxa_table[,i]<-toupper(taxa_table[,i])}
+
+write.csv(taxa_table, "data/taxonomy_reference_table.csv")
