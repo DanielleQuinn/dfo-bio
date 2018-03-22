@@ -7,6 +7,7 @@ library(dplyr)
 library(stringr)
 library(rfishbase)
 
+# Trim leading and trailing whitespace
 ISSPECIESCODES$SCIENTIFIC<-trimws(ISSPECIESCODES$SCIENTIFIC, which=c("both"))
 
 # Remove Reserved Species Codes
