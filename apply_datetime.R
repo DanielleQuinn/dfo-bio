@@ -22,11 +22,15 @@ datetime_all(print_all=FALSE)
 ept<-now()
 ept-spt
 
+# ---- Write Error Reports ----
 write.csv(errors_seq_1, "error-reports/errors_seq_1.csv", row.names=FALSE)
 write.csv(errors_seq_2, "error-reports/errors_seq_2.csv", row.names=FALSE)
 write.csv(errors_sten_2, "error-reports/errors_sten_2.csv", row.names=FALSE)
 write.csv(errors_seq_34, "error-reports/errors_seq_34.csv", row.names=FALSE)
 write.csv(errors_withinsetseq_34, "error-reports/errors_withinsetseq_34.csv", row.names=FALSE)
+
+
+
 
 # ---- Summary Statistics ----
 # How many trips per datetime variable type?

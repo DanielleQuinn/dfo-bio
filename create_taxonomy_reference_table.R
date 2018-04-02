@@ -4,6 +4,7 @@ library(rfishbase)
 FBtaxa<-load_taxa()
 SLtaxa<-load_taxa(server = "https://fishbase.ropensci.org/sealifebase")
 
+# Add TSN
 fish_taxa<-FBtaxa%>%
   select(Class, Order, Family, SubFamily, Genus, Species, FBname)%>%
   mutate(Source="FishBase")%>%
