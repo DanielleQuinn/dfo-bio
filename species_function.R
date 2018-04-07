@@ -1,4 +1,5 @@
 # ---- Function: clean_taxon ----
+# To do: Add taxonomic reference number and try alternate sources with Mike's code
 clean_taxon<-function(data=ISSPECIESCODES, taxadata=taxa_table, summary=FALSE)
 {
   taxa<-taxadata%>%mutate(SCIENTIFIC=paste(Genus, Species))%>%select(-X)
